@@ -1,0 +1,69 @@
+[project]
+name = "kivyapp"
+version = "0.1.2"
+description = ""
+readme = "README.md"
+requires-python = "~=3.11"
+dependencies = [
+    "configparser>=7.2.0",
+    "kivy>=2.3.1",
+    "plyer>=2.1.0",
+    "pydantic-settings>=2.10.1",
+    "python-dotenv>=1.0.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+
+[tool.poe.tasks]
+lint = "uv run ruff check . --fix"
+format = "uv run ruff format ."
+x = ["format", "lint"]
+
+[dependency-groups]
+dev = [
+    "poethepoet>=0.32.2",
+    "ruff>=0.9.7",
+]
+
+[tool.ruff]
+exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "ANN002",  # Missing type annotation for args
+  "ANN003",  # Missing type annotation for kwarg
+  "ERA001",  # Commented out code
+  "S104",    # Possible binding to all interfaces
+  "BLE001",  # Do not catch Exception
+  "FBT",     # Bools in arguments
+  "DTZ",     # Datetime timezone
+  "EM",      # f-strings in exception messages
+  "FIX",     # Left out TODO, FIXME, etc.
+  "INT",     # f-string in function execeution before calls
+  "G",       # Logging linting
+  "TD",      # Rules for TODO
+  "E501",    # Line too long
+  "E722",    # Do not use bare except
+  "W505",    # Doc line too long
+  "D100",    # Missing docstring
+  "D101",    # Missing docstring
+  "D102",    # Missing docstring
+  "D103",    # Missing docstring
+  "D104",    # Missing docstring
+  "D105",    # Missing docstring
+  "D106",    # Missing docstring
+  "D107",    # Missing docstring
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+inline-quotes = "double"
+multiline-quotes = "double"

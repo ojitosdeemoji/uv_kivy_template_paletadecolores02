@@ -1,0 +1,13 @@
+{
+  "apksigner_path": "@/Users/username/Downloads/build-tools/34.0.0/apksigner",
+  "keystore_path": "mykivyapp.keystore",
+  "keystore_alias": "mykivyapp-alias",
+  "keystore_password": "mysecretpassword",
+  "key_password": "mysecretpassword",
+  "cert_first_name": "John Doe",
+  "cert_org_unit": "Development Team",
+  "cert_org": "My Company",
+  "cert_city": "San Francisco",
+  "cert_state": "CA",
+  "cert_country": "US"
+}
