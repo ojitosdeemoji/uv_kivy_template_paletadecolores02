@@ -1,4 +1,4 @@
-name: Build APK
+name: Build APK (con reintentos automáticos)
 
 on: [push]
 
@@ -42,9 +42,29 @@ jobs:
         run: |
           pip install buildozer
 
-      - name: Build APK
+      - name: Build APK (con reintentos automáticos de NDK)
         run: |
-          buildozer -v android debug
+          # Lista de versiones de NDK a probar (de más estable a menos)
+          NDK_VERSIONS="26d 27c 28c 25b"
+          
+          for NDK in $NDK_VERSIONS; do
+            echo "🔄 Probando con NDK $NDK..."
+            
+            # Modificar temporalmente buildozer.spec para usar este NDK
+            sed -i "s/^android.ndk = .*/android.ndk = $NDK/" buildozer.spec
+            
+            # Intentar compilar
+            if buildozer -v android debug; then
+              echo "✅ ¡COMPILACIÓN EXITOSA con NDK $NDK!"
+              exit 0
+            else
+              echo "❌ Falló con NDK $NDK. Probando siguiente..."
+            fi
+          done
+          
+          # Si llegamos aquí, todas fallaron
+          echo "❌ Todas las versiones de NDK fallaron."
+          exit 1
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
