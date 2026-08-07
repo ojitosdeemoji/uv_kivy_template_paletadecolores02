@@ -1,4 +1,4 @@
-name: Build APK (con reintentos automáticos)
+name: Build APK (con NDK manual)
 
 on: [push]
 
@@ -20,6 +20,15 @@ jobs:
           sudo apt update
           sudo apt install -y zip unzip openjdk-17-jdk wget
 
+      - name: Download Android NDK (r23b) manually
+        run: |
+          mkdir -p $HOME/.buildozer/android/platform
+          cd $HOME/.buildozer/android/platform
+          wget -q https://dl.google.com/android/repository/android-ndk-r23b-linux.zip -O ndk.zip
+          unzip -q ndk.zip
+          rm ndk.zip
+          mv android-ndk-r23b android-ndk
+
       - name: Set up Android SDK
         run: |
           mkdir -p $HOME/.android/sdk
@@ -34,7 +43,8 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "ANDROID_HOME=$HOME/.android/sdk" >> $GITHUB_ENV
+          echo "ANDROID_NDK=$HOME/.buildozer/android/platform/android-ndk" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=$HOME/.buildozer/android/platform/android-ndk" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=$HOME/.android/sdk" >> $GITHUB_ENV
           echo "PATH=$PATH:$HOME/.android/sdk/cmdline-tools/latest/bin:$HOME/.android/sdk/platform-tools:$HOME/.android/sdk/build-tools/30.0.3" >> $GITHUB_ENV
 
@@ -42,29 +52,9 @@ jobs:
         run: |
           pip install buildozer
 
-      - name: Build APK (con reintentos automáticos de NDK)
+      - name: Build APK
         run: |
-          # Lista de versiones de NDK a probar (de más estable a menos)
-          NDK_VERSIONS="26d 27c 28c 25b"
-          
-          for NDK in $NDK_VERSIONS; do
-            echo "🔄 Probando con NDK $NDK..."
-            
-            # Modificar temporalmente buildozer.spec para usar este NDK
-            sed -i "s/^android.ndk = .*/android.ndk = $NDK/" buildozer.spec
-            
-            # Intentar compilar
-            if buildozer -v android debug; then
-              echo "✅ ¡COMPILACIÓN EXITOSA con NDK $NDK!"
-              exit 0
-            else
-              echo "❌ Falló con NDK $NDK. Probando siguiente..."
-            fi
-          done
-          
-          # Si llegamos aquí, todas fallaron
-          echo "❌ Todas las versiones de NDK fallaron."
-          exit 1
+          buildozer -v android debug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
